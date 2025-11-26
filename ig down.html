@@ -1,103 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InstaPocket - Instagram Downloader</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 40px;
-            text-align: center;
-        }
-        .box {
-            background: white;
-            max-width: 480px;
-            margin: auto;
-            padding: 25px;
-            border-radius: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        input {
-            width: 90%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            margin-top: 10px;
-        }
-        button {
-            padding: 10px 20px;
-            background: #ff3d71;
-            border: none;
-            color: white;
-            font-weight: bold;
-            border-radius: 6px;
-            margin-top: 15px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #e63665;
-        }
-        #result {
-            margin-top: 20px;
-        }
-        a.download-btn {
-            display: block;
-            margin-top: 12px;
-            padding: 10px;
-            background: #333;
-            color: white;
-            border-radius: 6px;
-            text-decoration: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gemini AI Web</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .container {
+      max-width: 650px;
+      background: white;
+      padding: 20px;
+      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00000020;
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+    button {
+      background: #0066ff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    #output {
+      white-space: pre-wrap;
+      margin-top: 15px;
+      background: #efefef;
+      padding: 10px;
+      border-radius: 6px;
+    }
+  </style>
 </head>
 <body>
 
-    <h1>📥 InstaPocket</h1>
-    <p>Download foto & video Instagram secara gratis</p>
+<div class="container">
+  <h2>Gemini AI Chat</h2>
+  <textarea id="input" placeholder="Tulis pertanyaan..."></textarea>
+  <button onclick="askAI()">Kirim</button>
 
-    <div class="box">
-        <input type="text" id="url" placeholder="Tempelkan link Instagram di sini..." />
-        <button onclick="downloadIG()">Download</button>
-
-        <div id="result"></div>
-    </div>
+  <div id="output"></div>
+</div>
 
 <script>
-function downloadIG() {
-    const link = document.getElementById("url").value;
-    if (!link) {
-        alert("Masukkan link Instagram terlebih dahulu!");
-        return;
+async function askAI() {
+  const text = document.getElementById("input").value;
+  const output = document.getElementById("output");
+  output.innerHTML = "⏳ Loading...";
+
+  const apiKey = "AIzaSyBflCEJmCegy5ZkNtFULCPbW86dVugCCxQ";
+
+  const body = {
+    contents: [{
+      role: "user",
+      parts: [{ text }]
+    }]
+  };
+
+  const res = await fetch(
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + apiKey,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
     }
+  );
 
-    document.getElementById("result").innerHTML = "⏳ Mengambil data...";
+  const data = await res.json();
 
-    // API publik (tidak perlu key)
-    fetch("https://api.savein.io/download?url=" + encodeURIComponent(link))
-        .then(res => res.json())
-        .then(data => {
-            if (!data.media || data.media.length === 0) {
-                document.getElementById("result").innerHTML = "Gagal mengambil media!";
-                return;
-            }
-
-            let output = "";
-            data.media.forEach((item, i) => {
-                output += `
-                    <div>
-                        <a class="download-btn" href="${item.url}" target="_blank">Download File ${i+1}</a>
-                    </div>
-                `;
-            });
-
-            document.getElementById("result").innerHTML = output;
-        })
-        .catch(err => {
-            document.getElementById("result").innerHTML = "Error mengambil data API.";
-        });
+  try {
+    output.textContent = data.candidates[0].content.parts[0].text;
+  } catch {
+    output.textContent = "❌ Error: cek API key atau kuota.";
+  }
 }
 </script>
 
